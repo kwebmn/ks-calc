@@ -1,0 +1,7 @@
+[
+  {"id":"wheat_bulk","name":"Wheat (bulk)","stowage_cbft_mt":47.0},
+  {"id":"corn_bulk","name":"Corn (bulk)","stowage_cbft_mt":48.0},
+  {"id":"sunflower_meal","name":"Sunflower meal","stowage_cbft_mt":52.0},
+  {"id":"fertilizer_bulk","name":"Fertilizer (bulk)","stowage_cbft_mt":38.0},
+  {"id":"steel_coils","name":"Steel coils","stowage_cbft_mt":22.0}
+]

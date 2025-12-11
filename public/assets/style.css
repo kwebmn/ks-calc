@@ -1,0 +1,11 @@
+body {
+  min-height: 100vh;
+}
+
+#resultCard {
+  transition: all 0.2s ease-in-out;
+}
+
+#alertPlaceholder .alert {
+  margin-bottom: 0;
+}
