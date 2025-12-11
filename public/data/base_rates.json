@@ -1,0 +1,16 @@
+{
+  "by_pair": {
+    "Reni": {"Mersin":21.50,"Iskenderun":22.20,"Alexandria":24.10},
+    "Odesa": {"Mersin":20.80,"Iskenderun":21.60,"Alexandria":22.90,"Genoa":28.00,"Barcelona":27.50},
+    "Chornomorsk": {"Alexandria":23.40,"Ravenna":28.50}
+  },
+  "fallback_by_discharge_port": {
+    "Mersin":21.00,
+    "Iskenderun":22.00,
+    "Alexandria":23.00,
+    "Damietta":23.30,
+    "Genoa":28.20,
+    "Ravenna":28.80,
+    "Barcelona":27.70
+  }
+}
