@@ -96,10 +96,10 @@ function resetForm() {
 async function initData() {
   try {
     const [loadPorts, dischargeCountries, dischargePorts, cargoes] = await Promise.all([
-      fetchJson('/data/load_ports.json'),
-      fetchJson('/data/discharge_countries.json'),
-      fetchJson('/data/discharge_ports.json'),
-      fetchJson('/data/cargoes.json'),
+      fetchJson('data/load_ports.json'),
+      fetchJson('data/discharge_countries.json'),
+      fetchJson('data/discharge_ports.json'),
+      fetchJson('data/cargoes.json'),
     ]);
 
     state.loadPorts = loadPorts;
@@ -134,7 +134,7 @@ async function handleSubmit(event) {
   };
 
   try {
-    const response = await fetch('/api/calc.php', {
+    const response = await fetch('api/calc.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
