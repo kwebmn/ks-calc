@@ -1,18 +1,6 @@
 const state = {
-  loadCountries: [],
-  loadPorts: {},
-  dischargeCountries: [],
-  dischargePorts: {},
-  cargoes: [],
+  config: null,
 };
-
-const quantityBrackets = [
-  { id: '3000', label: '3,000 mt', quantity: 3000 },
-  { id: '3000-5000', label: '3,000–5,000 mt', quantity: 4000 },
-  { id: '5000-10000', label: '5,000–10,000 mt', quantity: 7500 },
-  { id: '25000', label: '25,000 mt', quantity: 25000 },
-  { id: '50000', label: '50,000 mt', quantity: 50000 },
-];
 
 const elements = {};
 
@@ -35,8 +23,13 @@ function fillSelect(selectEl, options, placeholder) {
 
   options.forEach((item) => {
     const option = document.createElement('option');
-    option.value = item.id || item;
-    option.textContent = item.name || item;
+    if (typeof item === 'string') {
+      option.value = item;
+      option.textContent = item;
+    } else {
+      option.value = item.id;
+      option.textContent = item.label;
+    }
     selectEl.appendChild(option);
   });
 }
@@ -52,112 +45,60 @@ function clearAlert() {
 }
 
 function validateForm() {
-  const loadCountry = elements.loadCountry.value;
   const loadPort = elements.loadPort.value;
-  const dischargeCountry = elements.dischargeCountry.value;
   const dischargePort = elements.dischargePort.value;
   const cargo = elements.cargo.value;
-  const quantityOption = elements.quantity.selectedOptions[0];
-  const quantity = Number(quantityOption?.dataset.quantity ?? NaN);
-  const stowage = Number(elements.stowage.value);
+  const quantityBracket = elements.quantity.value;
 
-  const quantityValid = Number.isFinite(quantity) && quantity >= 3000 && quantity <= 50000;
-  const stowageValid = Number.isFinite(stowage) && stowage > 0;
-
-  const isValid = Boolean(loadCountry && loadPort && dischargeCountry && dischargePort && cargo) && quantityValid && stowageValid;
+  const isValid = Boolean(loadPort && dischargePort && cargo && quantityBracket);
   elements.calculateBtn.disabled = !isValid;
   return isValid;
 }
 
-function populateLoadPorts(country) {
-  const ports = state.loadPorts[country] || [];
-  const sortedPorts = [...ports].sort((a, b) => a.localeCompare(b));
-  fillSelect(elements.loadPort, sortedPorts, 'Select load port');
-  elements.loadPort.disabled = sortedPorts.length === 0;
-}
-
-function populateDischargePorts(country) {
-  const ports = state.dischargePorts[country] || [];
-  const sortedPorts = [...ports].sort((a, b) => a.localeCompare(b));
-  fillSelect(elements.dischargePort, sortedPorts, 'Select discharge port');
-  elements.dischargePort.disabled = sortedPorts.length === 0;
+function resetForm() {
+  elements.calcForm.reset();
+  elements.resultCard.classList.add('d-none');
+  elements.stowage.value = '';
+  elements.durationValue.textContent = '—';
+  elements.baseValue.textContent = '—';
+  elements.rateValue.textContent = '—';
+  elements.coefficientValue.textContent = '—';
+  elements.metaInfo.textContent = '';
+  clearAlert();
+  validateForm();
 }
 
 function handleCargoChange() {
-  const cargoId = elements.cargo.value;
-  const cargo = state.cargoes.find((item) => item.id === cargoId);
-  if (cargo) {
-    elements.stowage.value = cargo.stowage_cbft_mt;
-  }
+  const cargoName = elements.cargo.value;
+  const cargo = state.config?.cargo_stowage.find((item) => item.cargo === cargoName);
+  elements.stowage.value = cargo ? cargo.stowage_cbft_per_mt : '';
   validateForm();
 }
 
-function handleLoadCountryChange() {
-  const country = elements.loadCountry.value;
-  if (country) {
-    populateLoadPorts(country);
-  } else {
-    elements.loadPort.disabled = true;
-  }
-  validateForm();
-}
+function populateSelectors() {
+  const { meta, load_ports: loadPorts, discharge_ports: dischargePorts, cargo_stowage: cargoes } = state.config;
+  const sortedCargoes = [...cargoes].sort((a, b) => a.cargo.localeCompare(b.cargo));
 
-function handleCountryChange() {
-  const country = elements.dischargeCountry.value;
-  if (country) {
-    populateDischargePorts(country);
-  } else {
-    elements.dischargePort.disabled = true;
-  }
-  validateForm();
-}
+  fillSelect(elements.loadPort, loadPorts, 'Select load port');
+  fillSelect(elements.dischargePort, dischargePorts, 'Select discharge port');
+  fillSelect(
+    elements.cargo,
+    sortedCargoes.map((item) => item.cargo),
+    'Select cargo',
+  );
+  fillSelect(elements.quantity, meta.quantity_brackets, 'Select quantity bracket');
 
-function resetForm() {
-  elements.calcForm.reset();
-  elements.loadPort.disabled = true;
-  elements.dischargePort.disabled = true;
-  elements.calculateBtn.disabled = true;
-  elements.resultCard.classList.add('d-none');
-  elements.debugInfo.textContent = '';
-  clearAlert();
+  const lastUpdate = meta.last_update ? `Updated ${meta.last_update}` : 'Update date N/A';
+  elements.lastUpdate.textContent = lastUpdate;
 }
 
 async function initData() {
   try {
-    const [loadCountries, loadPorts, dischargeCountries, dischargePorts, cargoes] = await Promise.all([
-      fetchJson('data/load_countries.json'),
-      fetchJson('data/load_ports.json'),
-      fetchJson('data/discharge_countries.json'),
-      fetchJson('data/discharge_ports.json'),
-      fetchJson('data/cargoes.json'),
-    ]);
-
-    state.loadCountries = loadCountries;
-    state.loadPorts = loadPorts;
-    state.dischargeCountries = dischargeCountries;
-    state.dischargePorts = dischargePorts;
-    state.cargoes = cargoes;
-
-    fillSelect(elements.loadCountry, loadCountries, 'Select load country');
-    fillSelect(elements.dischargeCountry, dischargeCountries, 'Select country');
-    fillSelect(elements.cargo, cargoes, 'Select cargo');
-    const quantitySelect = elements.quantity;
-    quantitySelect.innerHTML = '';
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    placeholder.textContent = 'Select quantity bracket';
-    quantitySelect.appendChild(placeholder);
-    quantityBrackets.forEach((bracket) => {
-      const option = document.createElement('option');
-      option.value = bracket.id;
-      option.dataset.quantity = bracket.quantity;
-      option.textContent = bracket.label;
-      quantitySelect.appendChild(option);
-    });
+    const config = await fetchJson('data/freight_config.json');
+    state.config = config;
+    populateSelectors();
   } catch (error) {
-    showAlert(error.message || 'Failed to load data');
+    showAlert(error.message || 'Failed to load configuration');
   }
 }
 
@@ -166,18 +107,15 @@ async function handleSubmit(event) {
   clearAlert();
 
   if (!validateForm()) {
-    showAlert('Please fill all required fields correctly.');
+    showAlert('Please select load port, discharge port, cargo, and quantity bracket.');
     return;
   }
 
   const payload = {
-    load_country: elements.loadCountry.value,
     load_port: elements.loadPort.value,
-    discharge_country: elements.dischargeCountry.value,
     discharge_port: elements.dischargePort.value,
     cargo: elements.cargo.value,
-    stowage_cbft_mt: Number(elements.stowage.value),
-    quantity: Number(elements.quantity.selectedOptions[0]?.dataset.quantity ?? 0),
+    quantity_bracket: elements.quantity.value,
   };
 
   try {
@@ -192,12 +130,23 @@ async function handleSubmit(event) {
       throw new Error(data.error || 'Calculation failed');
     }
 
-    elements.rateValue.textContent = data.rate_usd_mt.toFixed(2);
-    elements.rangeValue.textContent = `${data.rate_range.min.toFixed(2)} – ${data.rate_range.max.toFixed(2)}`;
-    elements.totalValue.textContent = data.total_usd.toFixed(2);
-    elements.debugInfo.textContent = `Base: ${data.base_usd_mt.toFixed(2)} | Quantity mult: ${data.q_mult.toFixed(3)} | Cargo mult: ${data.cargo_mult.toFixed(3)} | Stowage: ${data.stowage_cbft_mt}`;
-
     elements.resultCard.classList.remove('d-none');
+    elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(1);
+    elements.baseValue.textContent = Number(data.base_rate_20000_usd_mt).toFixed(1);
+    elements.coefficientValue.textContent = Number(data.coefficient).toFixed(2);
+
+    const duration = data.voyage?.duration_days;
+    elements.durationValue.textContent = Number.isFinite(duration)
+      ? `${duration.toFixed(1)} days`
+      : 'N/A';
+
+    const metaSummary = [
+      `Currency: ${data.currency || 'USD'}`,
+      `Base qty: ${data.base_quantity_mt ?? 'N/A'} mt`,
+      `Speed: ${data.speed_knots ?? 'N/A'} kn`,
+      `Last update: ${data.last_update ?? 'N/A'}`,
+    ];
+    elements.metaInfo.textContent = metaSummary.join(' | ');
   } catch (error) {
     elements.resultCard.classList.add('d-none');
     showAlert(error.message || 'Calculation failed');
@@ -205,21 +154,16 @@ async function handleSubmit(event) {
 }
 
 function setupEventListeners() {
-  elements.dischargeCountry.addEventListener('change', handleCountryChange);
-  elements.loadCountry.addEventListener('change', handleLoadCountryChange);
   elements.loadPort.addEventListener('change', validateForm);
-  elements.cargo.addEventListener('change', handleCargoChange);
-  elements.stowage.addEventListener('input', validateForm);
-  elements.quantity.addEventListener('change', validateForm);
   elements.dischargePort.addEventListener('change', validateForm);
+  elements.cargo.addEventListener('change', handleCargoChange);
+  elements.quantity.addEventListener('change', validateForm);
   elements.calcForm.addEventListener('submit', handleSubmit);
   elements.resetBtn.addEventListener('click', resetForm);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  elements.loadCountry = document.getElementById('loadCountry');
   elements.loadPort = document.getElementById('loadPort');
-  elements.dischargeCountry = document.getElementById('dischargeCountry');
   elements.dischargePort = document.getElementById('dischargePort');
   elements.cargo = document.getElementById('cargo');
   elements.stowage = document.getElementById('stowage');
@@ -229,10 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.calcForm = document.getElementById('calcForm');
   elements.resultCard = document.getElementById('resultCard');
   elements.rateValue = document.getElementById('rateValue');
-  elements.rangeValue = document.getElementById('rangeValue');
-  elements.totalValue = document.getElementById('totalValue');
-  elements.debugInfo = document.getElementById('debugInfo');
+  elements.baseValue = document.getElementById('baseValue');
+  elements.coefficientValue = document.getElementById('coefficientValue');
+  elements.durationValue = document.getElementById('durationValue');
+  elements.metaInfo = document.getElementById('metaInfo');
   elements.alertPlaceholder = document.getElementById('alertPlaceholder');
+  elements.lastUpdate = document.getElementById('lastUpdate');
 
   setupEventListeners();
   initData();
