@@ -7,7 +7,7 @@ const elements = {};
 async function fetchJson(path) {
   const response = await fetch(path);
   if (!response.ok) {
-    throw new Error(`Не удалось загрузить ${path}`);
+    throw new Error(`Failed to load ${path}`);
   }
   return response.json();
 }
@@ -79,18 +79,18 @@ function populateSelectors() {
   const { meta, load_ports: loadPorts, discharge_ports: dischargePorts, cargo_stowage: cargoes } = state.config;
   const sortedCargoes = [...cargoes].sort((a, b) => a.cargo.localeCompare(b.cargo));
 
-  fillSelect(elements.loadPort, loadPorts, 'Выберите порт погрузки');
-  fillSelect(elements.dischargePort, dischargePorts, 'Выберите порт выгрузки');
+  fillSelect(elements.loadPort, loadPorts, 'Select load port');
+  fillSelect(elements.dischargePort, dischargePorts, 'Select discharge port');
   fillSelect(
     elements.cargo,
     sortedCargoes.map((item) => item.cargo),
-    'Выберите груз',
+    'Select cargo',
   );
-  fillSelect(elements.quantity, meta.quantity_brackets, 'Выберите диапазон количества');
+  fillSelect(elements.quantity, meta.quantity_brackets, 'Select quantity bracket');
 
   const lastUpdate = meta.last_update
-    ? `Обновлено ${meta.last_update}`
-    : 'Дата обновления недоступна';
+    ? `Updated ${meta.last_update}`
+    : 'Update date is unavailable';
   elements.lastUpdate.textContent = lastUpdate;
 }
 
@@ -100,7 +100,7 @@ async function initData() {
     state.config = config;
     populateSelectors();
   } catch (error) {
-    showAlert(error.message || 'Не удалось загрузить конфигурацию');
+    showAlert(error.message || 'Failed to load configuration');
   }
 }
 
@@ -109,7 +109,7 @@ async function handleSubmit(event) {
   clearAlert();
 
   if (!validateForm()) {
-    showAlert('Выберите порт погрузки, порт выгрузки, груз и диапазон количества.');
+    showAlert('Select load port, discharge port, cargo, and quantity bracket.');
     return;
   }
 
@@ -129,17 +129,17 @@ async function handleSubmit(event) {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.error || 'Ошибка расчета');
+      throw new Error(data.error || 'Calculation error');
     }
 
     if (data.match_level === 'ports_only') {
       showAlert(
-        'Использованы ставки для выбранной пары портов (данных по грузу нет).',
+        'Used port-pair rates because cargo-specific data is missing.',
         'warning',
       );
     } else if (data.match_level === 'default') {
       showAlert(
-        'Использована универсальная ставка по умолчанию (маршрут отсутствует в базе).',
+        'Used default fallback rate because the route is not in the database.',
         'warning',
       );
     } else {
@@ -153,19 +153,19 @@ async function handleSubmit(event) {
 
     const duration = data.voyage?.duration_days;
     elements.durationValue.textContent = Number.isFinite(duration)
-      ? `${duration.toFixed(1)} дн.`
-      : 'Н/Д';
+      ? `${duration.toFixed(1)} days`
+      : 'N/A';
 
     const metaSummary = [
-      `Валюта: ${data.currency || 'USD'}`,
-      `Базовый объем: ${data.base_quantity_mt ?? 'Н/Д'} т`,
-      `Скорость: ${data.speed_knots ?? 'Н/Д'} уз`,
-      `Последнее обновление: ${data.last_update ?? 'Н/Д'}`,
+      `Currency: ${data.currency || 'USD'}`,
+      `Base quantity: ${data.base_quantity_mt ?? 'N/A'} mt`,
+      `Speed: ${data.speed_knots ?? 'N/A'} kn`,
+      `Last update: ${data.last_update ?? 'N/A'}`,
     ];
     elements.metaInfo.textContent = metaSummary.join(' | ');
   } catch (error) {
     elements.resultCard.classList.add('d-none');
-    showAlert(error.message || 'Ошибка расчета');
+    showAlert(error.message || 'Calculation error');
   }
 }
 
