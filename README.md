@@ -12,6 +12,7 @@ Open the demo at http://localhost:8080/demo.html
 
 ## Data files
 
+- `public/data/load_countries.json`
 - `public/data/load_ports.json`
 - `public/data/discharge_countries.json`
 - `public/data/discharge_ports.json`
@@ -29,45 +30,49 @@ Open the demo at http://localhost:8080/demo.html
 Each example posts JSON to `http://localhost:8080/api/calc.php`.
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "load_port": "Reni",
-  "discharge_country": "Turkey",
-  "discharge_port": "Mersin",
-  "cargo": "wheat_bulk",
-  "stowage_cbft_mt": 47.0,
-  "quantity": 20000
-}' http://localhost:8080/api/calc.php
+  curl -X POST -H "Content-Type: application/json" -d '{
+    "load_country": "Ukraine",
+    "load_port": "Reni",
+    "discharge_country": "Turkey",
+    "discharge_port": "Mersin",
+    "cargo": "wheat_bulk",
+    "stowage_cbft_mt": 47.0,
+    "quantity": 20000
+  }' http://localhost:8080/api/calc.php
 ```
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "load_port": "Odesa",
-  "discharge_country": "Egypt",
-  "discharge_port": "Alexandria",
-  "cargo": "corn_bulk",
-  "stowage_cbft_mt": 48.0,
-  "quantity": 15000
-}' http://localhost:8080/api/calc.php
+  curl -X POST -H "Content-Type: application/json" -d '{
+    "load_country": "Ukraine",
+    "load_port": "Odesa",
+    "discharge_country": "Egypt",
+    "discharge_port": "Alexandria",
+    "cargo": "corn_bulk",
+    "stowage_cbft_mt": 48.0,
+    "quantity": 15000
+  }' http://localhost:8080/api/calc.php
 ```
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "load_port": "Chornomorsk",
-  "discharge_country": "Italy",
-  "discharge_port": "Ravenna",
-  "cargo": "sunflower_meal",
-  "stowage_cbft_mt": 52.0,
-  "quantity": 30000
-}' http://localhost:8080/api/calc.php
+  curl -X POST -H "Content-Type: application/json" -d '{
+    "load_country": "Ukraine",
+    "load_port": "Chornomorsk",
+    "discharge_country": "Italy",
+    "discharge_port": "Ravenna",
+    "cargo": "sunflower_meal",
+    "stowage_cbft_mt": 52.0,
+    "quantity": 30000
+  }' http://localhost:8080/api/calc.php
 ```
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "load_port": "Odesa",
-  "discharge_country": "Spain",
-  "discharge_port": "Barcelona",
-  "cargo": "steel_coils",
-  "stowage_cbft_mt": 22.0,
-  "quantity": 5000
-}' http://localhost:8080/api/calc.php
+  curl -X POST -H "Content-Type: application/json" -d '{
+    "load_country": "Ukraine",
+    "load_port": "Odesa",
+    "discharge_country": "Spain",
+    "discharge_port": "Barcelona",
+    "cargo": "steel_coils",
+    "stowage_cbft_mt": 22.0,
+    "quantity": 5000
+  }' http://localhost:8080/api/calc.php
 ```

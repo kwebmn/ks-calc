@@ -1,6 +1,20 @@
 {
-  "Turkey": ["Iskenderun","Mersin"],
-  "Egypt": ["Alexandria","Damietta"],
-  "Italy": ["Genoa","Ravenna"],
-  "Spain": ["Barcelona"]
+  "Turkey": ["Iskenderun", "Mersin", "Izmir", "Istanbul", "Samsun"],
+  "Egypt": ["Alexandria", "Damietta", "Port Said", "Sokhna"],
+  "Italy": ["Genoa", "Ravenna", "Taranto", "Livorno", "Trieste"],
+  "Spain": ["Barcelona", "Valencia", "Algeciras", "Bilbao"],
+  "Greece": ["Piraeus", "Thessaloniki", "Patras"],
+  "Romania": ["Constanta", "Midia"],
+  "Bulgaria": ["Varna", "Burgas"],
+  "Israel": ["Ashdod", "Haifa"],
+  "Lebanon": ["Beirut", "Tripoli"],
+  "Morocco": ["Casablanca", "Tangier Med"],
+  "France": ["Marseille", "Le Havre"],
+  "Netherlands": ["Rotterdam", "Amsterdam"],
+  "United Kingdom": ["Liverpool", "London Gateway", "Felixstowe"],
+  "Germany": ["Hamburg", "Bremerhaven"],
+  "Saudi Arabia": ["Jeddah", "Dammam"],
+  "United Arab Emirates": ["Jebel Ali", "Abu Dhabi", "Sharjah"],
+  "Ukraine": ["Odesa", "Chornomorsk", "Pivdennyi"],
+  "Georgia": ["Poti", "Batumi"]
 }
