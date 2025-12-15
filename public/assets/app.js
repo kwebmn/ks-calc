@@ -130,6 +130,15 @@ async function handleSubmit(event) {
       throw new Error(data.error || 'Calculation failed');
     }
 
+    if (data.match_level === 'ports_only') {
+      showAlert(
+        'Использованы ставки для выбранной пары портов (данных по грузу нет).',
+        'warning',
+      );
+    } else {
+      clearAlert();
+    }
+
     elements.resultCard.classList.remove('d-none');
     elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(1);
     elements.baseValue.textContent = Number(data.base_rate_20000_usd_mt).toFixed(1);

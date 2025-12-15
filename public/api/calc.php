@@ -82,6 +82,8 @@ if (!array_key_exists($cargoName, $cargoMap)) {
 }
 
 $routeData = null;
+$matchLevel = null; // exact | ports_only
+
 foreach ($config['routes'] ?? [] as $route) {
     if (
         isset($route['load_port'], $route['discharge_port'], $route['cargo'])
@@ -90,7 +92,23 @@ foreach ($config['routes'] ?? [] as $route) {
         && $route['cargo'] === $cargoName
     ) {
         $routeData = $route;
+        $matchLevel = 'exact';
         break;
+    }
+}
+
+// Fallback: allow base rate + distance shared for the port pair even if cargo-specific entry is missing
+if ($routeData === null) {
+    foreach ($config['routes'] ?? [] as $route) {
+        if (
+            isset($route['load_port'], $route['discharge_port'])
+            && $route['load_port'] === $input['load_port']
+            && $route['discharge_port'] === $input['discharge_port']
+        ) {
+            $routeData = $route;
+            $matchLevel = 'ports_only';
+            break;
+        }
     }
 }
 
@@ -133,6 +151,7 @@ $response = [
     'coefficient' => $coefficient,
     'quantity_bracket' => $quantityBracketId,
     'stowage_cbft_per_mt' => $cargoMap[$cargoName],
+    'match_level' => $matchLevel,
     'voyage' => [
         'distance_nm' => $distanceNm,
         'duration_days' => $durationDays,
