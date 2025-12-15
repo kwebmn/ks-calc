@@ -6,14 +6,14 @@ header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode(['error' => 'Метод не поддерживается']);
     exit;
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid JSON payload']);
+    echo json_encode(['error' => 'Некорректный JSON']);
     exit;
 }
 
@@ -21,7 +21,7 @@ $requiredFields = ['load_port', 'discharge_port', 'cargo', 'quantity_bracket'];
 foreach ($requiredFields as $field) {
     if (!isset($input[$field]) || $input[$field] === '' || $input[$field] === null) {
         http_response_code(400);
-        echo json_encode(['error' => "Missing field: {$field}"]);
+        echo json_encode(['error' => "Отсутствует поле: {$field}"]);
         exit;
     }
 }
@@ -29,7 +29,7 @@ foreach ($requiredFields as $field) {
 $configPath = realpath(__DIR__ . '/../data/freight_config.json');
 if ($configPath === false || !file_exists($configPath)) {
     http_response_code(500);
-    echo json_encode(['error' => 'Configuration file not found']);
+    echo json_encode(['error' => 'Файл конфигурации не найден']);
     exit;
 }
 
@@ -37,7 +37,7 @@ $configContents = file_get_contents($configPath);
 $config = json_decode($configContents, true);
 if (!is_array($config)) {
     http_response_code(500);
-    echo json_encode(['error' => 'Configuration file is malformed']);
+    echo json_encode(['error' => 'Файл конфигурации поврежден']);
     exit;
 }
 
@@ -47,7 +47,7 @@ $quantityBracketId = (string) $input['quantity_bracket'];
 
 if (!array_key_exists($quantityBracketId, $coefficients)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Unknown quantity bracket']);
+    echo json_encode(['error' => 'Неизвестный диапазон количества']);
     exit;
 }
 
@@ -57,13 +57,13 @@ $cargoStowage = $config['cargo_stowage'] ?? [];
 
 if (!in_array($input['load_port'], $loadPorts, true)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Load port is not in the approved list']);
+    echo json_encode(['error' => 'Порт погрузки отсутствует в списке']);
     exit;
 }
 
 if (!in_array($input['discharge_port'], $dischargePorts, true)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Discharge port is not in the approved list']);
+    echo json_encode(['error' => 'Порт выгрузки отсутствует в списке']);
     exit;
 }
 
@@ -77,7 +77,7 @@ foreach ($cargoStowage as $cargoEntry) {
 $cargoName = (string) $input['cargo'];
 if (!array_key_exists($cargoName, $cargoMap)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Cargo is not in the approved list']);
+    echo json_encode(['error' => 'Груз отсутствует в списке']);
     exit;
 }
 
@@ -128,7 +128,7 @@ if ($routeData === null) {
 
 if ($routeData === null) {
     http_response_code(404);
-    echo json_encode(['error' => 'No data available for the selected route.']);
+    echo json_encode(['error' => 'Нет данных по выбранному маршруту.']);
     exit;
 }
 
@@ -138,7 +138,7 @@ $baseRate = isset($routeData['base_rate_20000_usd_mt'])
 
 if ($baseRate === null || $baseRate <= 0) {
     http_response_code(500);
-    echo json_encode(['error' => 'Base rate is missing or invalid for the selected route']);
+    echo json_encode(['error' => 'Базовая ставка отсутствует или некорректна для выбранного маршрута']);
     exit;
 }
 
