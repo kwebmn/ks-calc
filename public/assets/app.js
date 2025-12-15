@@ -1,9 +1,18 @@
 const state = {
-  loadPorts: [],
+  loadCountries: [],
+  loadPorts: {},
   dischargeCountries: [],
   dischargePorts: {},
   cargoes: [],
 };
+
+const quantityBrackets = [
+  { id: '3000', label: '3,000 mt', quantity: 3000 },
+  { id: '3000-5000', label: '3,000–5,000 mt', quantity: 4000 },
+  { id: '5000-10000', label: '5,000–10,000 mt', quantity: 7500 },
+  { id: '25000', label: '25,000 mt', quantity: 25000 },
+  { id: '50000', label: '50,000 mt', quantity: 50000 },
+];
 
 const elements = {};
 
@@ -43,19 +52,28 @@ function clearAlert() {
 }
 
 function validateForm() {
+  const loadCountry = elements.loadCountry.value;
   const loadPort = elements.loadPort.value;
   const dischargeCountry = elements.dischargeCountry.value;
   const dischargePort = elements.dischargePort.value;
   const cargo = elements.cargo.value;
-  const quantity = Number(elements.quantity.value);
+  const quantityOption = elements.quantity.selectedOptions[0];
+  const quantity = Number(quantityOption?.dataset.quantity ?? NaN);
   const stowage = Number(elements.stowage.value);
 
-  const quantityValid = Number.isFinite(quantity) && quantity >= 5000 && quantity <= 50000;
+  const quantityValid = Number.isFinite(quantity) && quantity >= 3000 && quantity <= 50000;
   const stowageValid = Number.isFinite(stowage) && stowage > 0;
 
-  const isValid = Boolean(loadPort && dischargeCountry && dischargePort && cargo) && quantityValid && stowageValid;
+  const isValid = Boolean(loadCountry && loadPort && dischargeCountry && dischargePort && cargo) && quantityValid && stowageValid;
   elements.calculateBtn.disabled = !isValid;
   return isValid;
+}
+
+function populateLoadPorts(country) {
+  const ports = state.loadPorts[country] || [];
+  const sortedPorts = [...ports].sort((a, b) => a.localeCompare(b));
+  fillSelect(elements.loadPort, sortedPorts, 'Select load port');
+  elements.loadPort.disabled = sortedPorts.length === 0;
 }
 
 function populateDischargePorts(country) {
@@ -74,6 +92,16 @@ function handleCargoChange() {
   validateForm();
 }
 
+function handleLoadCountryChange() {
+  const country = elements.loadCountry.value;
+  if (country) {
+    populateLoadPorts(country);
+  } else {
+    elements.loadPort.disabled = true;
+  }
+  validateForm();
+}
+
 function handleCountryChange() {
   const country = elements.dischargeCountry.value;
   if (country) {
@@ -86,6 +114,7 @@ function handleCountryChange() {
 
 function resetForm() {
   elements.calcForm.reset();
+  elements.loadPort.disabled = true;
   elements.dischargePort.disabled = true;
   elements.calculateBtn.disabled = true;
   elements.resultCard.classList.add('d-none');
@@ -95,21 +124,38 @@ function resetForm() {
 
 async function initData() {
   try {
-    const [loadPorts, dischargeCountries, dischargePorts, cargoes] = await Promise.all([
+    const [loadCountries, loadPorts, dischargeCountries, dischargePorts, cargoes] = await Promise.all([
+      fetchJson('data/load_countries.json'),
       fetchJson('data/load_ports.json'),
       fetchJson('data/discharge_countries.json'),
       fetchJson('data/discharge_ports.json'),
       fetchJson('data/cargoes.json'),
     ]);
 
+    state.loadCountries = loadCountries;
     state.loadPorts = loadPorts;
     state.dischargeCountries = dischargeCountries;
     state.dischargePorts = dischargePorts;
     state.cargoes = cargoes;
 
-    fillSelect(elements.loadPort, loadPorts, 'Select load port');
+    fillSelect(elements.loadCountry, loadCountries, 'Select load country');
     fillSelect(elements.dischargeCountry, dischargeCountries, 'Select country');
     fillSelect(elements.cargo, cargoes, 'Select cargo');
+    const quantitySelect = elements.quantity;
+    quantitySelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = 'Select quantity bracket';
+    quantitySelect.appendChild(placeholder);
+    quantityBrackets.forEach((bracket) => {
+      const option = document.createElement('option');
+      option.value = bracket.id;
+      option.dataset.quantity = bracket.quantity;
+      option.textContent = bracket.label;
+      quantitySelect.appendChild(option);
+    });
   } catch (error) {
     showAlert(error.message || 'Failed to load data');
   }
@@ -125,12 +171,13 @@ async function handleSubmit(event) {
   }
 
   const payload = {
+    load_country: elements.loadCountry.value,
     load_port: elements.loadPort.value,
     discharge_country: elements.dischargeCountry.value,
     discharge_port: elements.dischargePort.value,
     cargo: elements.cargo.value,
     stowage_cbft_mt: Number(elements.stowage.value),
-    quantity: Number(elements.quantity.value),
+    quantity: Number(elements.quantity.selectedOptions[0]?.dataset.quantity ?? 0),
   };
 
   try {
@@ -159,16 +206,18 @@ async function handleSubmit(event) {
 
 function setupEventListeners() {
   elements.dischargeCountry.addEventListener('change', handleCountryChange);
+  elements.loadCountry.addEventListener('change', handleLoadCountryChange);
+  elements.loadPort.addEventListener('change', validateForm);
   elements.cargo.addEventListener('change', handleCargoChange);
   elements.stowage.addEventListener('input', validateForm);
-  elements.quantity.addEventListener('input', validateForm);
-  elements.loadPort.addEventListener('change', validateForm);
+  elements.quantity.addEventListener('change', validateForm);
   elements.dischargePort.addEventListener('change', validateForm);
   elements.calcForm.addEventListener('submit', handleSubmit);
   elements.resetBtn.addEventListener('click', resetForm);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  elements.loadCountry = document.getElementById('loadCountry');
   elements.loadPort = document.getElementById('loadPort');
   elements.dischargeCountry = document.getElementById('dischargeCountry');
   elements.dischargePort = document.getElementById('dischargePort');

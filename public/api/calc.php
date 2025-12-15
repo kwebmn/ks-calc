@@ -17,7 +17,7 @@ if (!is_array($input)) {
     exit;
 }
 
-$requiredFields = ['load_port', 'discharge_country', 'discharge_port', 'cargo', 'stowage_cbft_mt', 'quantity'];
+$requiredFields = ['load_country', 'load_port', 'discharge_country', 'discharge_port', 'cargo', 'stowage_cbft_mt', 'quantity'];
 foreach ($requiredFields as $field) {
     if (!isset($input[$field]) || $input[$field] === '' || $input[$field] === null) {
         http_response_code(400);
@@ -27,9 +27,9 @@ foreach ($requiredFields as $field) {
 }
 
 $quantity = filter_var($input['quantity'], FILTER_VALIDATE_FLOAT);
-if ($quantity === false || $quantity < 5000 || $quantity > 50000) {
+if ($quantity === false || $quantity < 3000 || $quantity > 50000) {
     http_response_code(400);
-    echo json_encode(['error' => 'Quantity must be between 5000 and 50000']);
+    echo json_encode(['error' => 'Quantity must be between 3000 and 50000']);
     exit;
 }
 
@@ -57,7 +57,15 @@ function loadJson(string $path): array
     return is_array($decoded) ? $decoded : [];
 }
 
+$loadPorts = loadJson($dataDir . '/load_ports.json');
 $dischargePorts = loadJson($dataDir . '/discharge_ports.json');
+
+if (!isset($loadPorts[$input['load_country']]) || !in_array($input['load_port'], $loadPorts[$input['load_country']], true)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Load port does not belong to selected load country']);
+    exit;
+}
+
 if (!isset($dischargePorts[$input['discharge_country']]) || !in_array($input['discharge_port'], $dischargePorts[$input['discharge_country']], true)) {
     http_response_code(400);
     echo json_encode(['error' => 'Discharge port does not belong to selected country']);

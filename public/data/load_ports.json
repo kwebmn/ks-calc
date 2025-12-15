@@ -1,1 +1,11 @@
-["Odesa","Chornomorsk","Reni"]
+{
+  "Ukraine": ["Odesa", "Chornomorsk", "Reni", "Mykolaiv", "Pivdennyi"],
+  "Romania": ["Constanta", "Midia"],
+  "Bulgaria": ["Varna", "Burgas"],
+  "Turkey": ["Istanbul", "Izmir", "Mersin", "Samsun"],
+  "Georgia": ["Poti", "Batumi"],
+  "Greece": ["Thessaloniki", "Piraeus"],
+  "Italy": ["Trieste", "Venice", "Gioia Tauro"],
+  "Spain": ["Valencia", "Barcelona", "Algeciras"],
+  "Egypt": ["Alexandria", "Damietta", "Port Said"]
+}
