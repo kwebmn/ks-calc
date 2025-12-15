@@ -191,6 +191,13 @@
       "cargo": "Sulphur (bulk)",
       "base_rate_20000_usd_mt": 26.4,
       "distance_nm": 1650
+    },
+    {
+      "load_port": "Galati, Romania",
+      "discharge_port": "Barcelona, Spain",
+      "cargo": "Cement (bagged)",
+      "base_rate_20000_usd_mt": 28.7,
+      "distance_nm": 1750
     }
   ]
 }
