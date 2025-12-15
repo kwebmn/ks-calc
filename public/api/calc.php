@@ -82,7 +82,7 @@ if (!array_key_exists($cargoName, $cargoMap)) {
 }
 
 $routeData = null;
-$matchLevel = null; // exact | ports_only
+$matchLevel = null; // exact | ports_only | default
 
 foreach ($config['routes'] ?? [] as $route) {
     if (
@@ -109,6 +109,20 @@ if ($routeData === null) {
             $matchLevel = 'ports_only';
             break;
         }
+    }
+}
+
+if ($routeData === null) {
+    $defaultBaseRate = isset($meta['default_base_rate_20000_usd_mt'])
+        ? (float) $meta['default_base_rate_20000_usd_mt']
+        : null;
+
+    if ($defaultBaseRate !== null && $defaultBaseRate > 0) {
+        $routeData = [
+            'base_rate_20000_usd_mt' => $defaultBaseRate,
+            'distance_nm' => $meta['default_distance_nm'] ?? null,
+        ];
+        $matchLevel = 'default';
     }
 }
 

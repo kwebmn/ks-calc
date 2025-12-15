@@ -135,6 +135,11 @@ async function handleSubmit(event) {
         'Использованы ставки для выбранной пары портов (данных по грузу нет).',
         'warning',
       );
+    } else if (data.match_level === 'default') {
+      showAlert(
+        'Использована универсальная ставка по умолчанию (маршрут отсутствует в базе).',
+        'warning',
+      );
     } else {
       clearAlert();
     }

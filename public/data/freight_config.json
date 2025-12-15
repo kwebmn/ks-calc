@@ -3,6 +3,8 @@
     "currency": "USD",
     "base_quantity_mt": 20000,
     "speed_knots": 10.0,
+    "default_base_rate_20000_usd_mt": 25.0,
+    "default_distance_nm": 1200,
     "last_update": "2025-12-16",
     "quantity_brackets": [
       {"id": "5000-7000", "label": "5 000–7 000", "min_mt": 5000, "max_mt": 7000},
