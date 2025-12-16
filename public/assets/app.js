@@ -59,11 +59,7 @@ function resetForm() {
   elements.calcForm.reset();
   elements.resultCard.classList.add('d-none');
   elements.stowage.value = '';
-  elements.durationValue.textContent = '—';
-  elements.baseValue.textContent = '—';
   elements.rateValue.textContent = '—';
-  elements.coefficientValue.textContent = '—';
-  elements.metaInfo.textContent = '';
   clearAlert();
   validateForm();
 }
@@ -148,21 +144,6 @@ async function handleSubmit(event) {
 
     elements.resultCard.classList.remove('d-none');
     elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(1);
-    elements.baseValue.textContent = Number(data.base_rate_20000_usd_mt).toFixed(1);
-    elements.coefficientValue.textContent = Number(data.coefficient).toFixed(2);
-
-    const duration = data.voyage?.duration_days;
-    elements.durationValue.textContent = Number.isFinite(duration)
-      ? `${duration.toFixed(1)} days`
-      : 'N/A';
-
-    const metaSummary = [
-      `Currency: ${data.currency || 'USD'}`,
-      `Base quantity: ${data.base_quantity_mt ?? 'N/A'} mt`,
-      `Speed: ${data.speed_knots ?? 'N/A'} kn`,
-      `Last update: ${data.last_update ?? 'N/A'}`,
-    ];
-    elements.metaInfo.textContent = metaSummary.join(' | ');
   } catch (error) {
     elements.resultCard.classList.add('d-none');
     showAlert(error.message || 'Calculation error');
@@ -189,10 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.calcForm = document.getElementById('calcForm');
   elements.resultCard = document.getElementById('resultCard');
   elements.rateValue = document.getElementById('rateValue');
-  elements.baseValue = document.getElementById('baseValue');
-  elements.coefficientValue = document.getElementById('coefficientValue');
-  elements.durationValue = document.getElementById('durationValue');
-  elements.metaInfo = document.getElementById('metaInfo');
   elements.alertPlaceholder = document.getElementById('alertPlaceholder');
   elements.lastUpdate = document.getElementById('lastUpdate');
 
