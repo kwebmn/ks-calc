@@ -143,7 +143,7 @@ if ($baseRate === null || $baseRate <= 0) {
 }
 
 $coefficient = (float) $coefficients[$quantityBracketId];
-$rateUsdMt = round($baseRate * $coefficient, 1);
+$rateUsdMt = round($baseRate * $coefficient, 2);
 
 $distanceNm = isset($routeData['distance_nm']) && is_numeric($routeData['distance_nm'])
     ? (float) $routeData['distance_nm']
@@ -152,7 +152,7 @@ $distanceNm = isset($routeData['distance_nm']) && is_numeric($routeData['distanc
 $speedKnots = isset($meta['speed_knots']) ? (float) $meta['speed_knots'] : null;
 $durationDays = null;
 if ($distanceNm !== null && $speedKnots !== null && $speedKnots > 0) {
-    $durationDays = round($distanceNm / $speedKnots / 24, 1);
+    $durationDays = round($distanceNm / $speedKnots / 24, 2);
 }
 
 $response = [

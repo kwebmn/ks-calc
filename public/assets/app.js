@@ -129,7 +129,7 @@ async function handleSubmit(event) {
     }
 
     elements.resultCard.classList.remove('d-none');
-    elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(1);
+    elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(2);
   } catch (error) {
     elements.resultCard.classList.add('d-none');
     showAlert(error.message || 'Calculation error');
