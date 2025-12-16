@@ -128,20 +128,6 @@ async function handleSubmit(event) {
       throw new Error(data.error || 'Calculation error');
     }
 
-    if (data.match_level === 'ports_only') {
-      showAlert(
-        'Used port-pair rates because cargo-specific data is missing.',
-        'warning',
-      );
-    } else if (data.match_level === 'default') {
-      showAlert(
-        'Used default fallback rate because the route is not in the database.',
-        'warning',
-      );
-    } else {
-      clearAlert();
-    }
-
     elements.resultCard.classList.remove('d-none');
     elements.rateValue.textContent = Number(data.rate_usd_mt).toFixed(1);
   } catch (error) {
