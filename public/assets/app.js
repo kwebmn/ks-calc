@@ -84,10 +84,6 @@ function populateSelectors() {
   );
   fillSelect(elements.quantity, meta.quantity_brackets, 'Select quantity bracket');
 
-  const lastUpdate = meta.last_update
-    ? `Updated ${meta.last_update}`
-    : 'Update date is unavailable';
-  elements.lastUpdate.textContent = lastUpdate;
 }
 
 async function initData() {
@@ -157,8 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.resultCard = document.getElementById('resultCard');
   elements.rateValue = document.getElementById('rateValue');
   elements.alertPlaceholder = document.getElementById('alertPlaceholder');
-  elements.lastUpdate = document.getElementById('lastUpdate');
-
   setupEventListeners();
   initData();
 });
